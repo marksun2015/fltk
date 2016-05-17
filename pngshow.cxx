@@ -1,3 +1,8 @@
+/*    makeinclude add $((LINKFLTKIMG))
+*	  $(CXX) $(ARCHFLAGS) $(LDFLAGS) $< $(LINKFLTK) $(LINKFLTKIMG) $(LDLIBS) -o $@  
+*
+*
+*/
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl.H>
