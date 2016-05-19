@@ -12,6 +12,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <sys/time.h>
 
 #include <fltk/SharedImage.h>
 #include <fltk/draw.h>
@@ -29,28 +30,35 @@
 #include <fltk/ToggleButton.h>
 #include <fltk/TextDisplay.h>
 #include <fltk/PackedGroup.h>
+
 using namespace fltk;
 
-#define KEYCODE XK_A
+#define WIDTH 800
+#define HEIGHT 480 
+#define BW 80 
+#define BH 40
+#define FONT_SIZE 64 
+
+Thread prime_thread;
 
 SharedImage *image;
 SharedImage *imageempty;
 SharedImage *imagepng1 = pngImage::get("main.png");
 SharedImage *imagepng2 = pngImage::get("mario.png");
 SharedImage *imagejpeg = jpegImage::get("Ficon.jpg");
-Thread prime_thread;
 
 Window *win;
 Widget *box;
+
 Widget *textdisplay1;
 Widget *textdisplay2;
 Widget *textdisplay3;
 Widget *textdisplay4;
-
 Widget *textdisplay5;
 Widget *textdisplay6;
 Widget *textdisplay7;
 Widget *textdisplay8;
+
 PackedGroup *group1; 
 PackedGroup *group2; 
 
@@ -82,10 +90,10 @@ void textset(Widget *textdisplay,int size,const char *string){
 void text_cb(Widget *,void *){
 	box->hide(); 
 	box->image((Image*)imageempty);
-	textset(textdisplay1,64,"hello world!!!");
-	textset(textdisplay2,64,"hello world!!!");
-	textset(textdisplay3,64,"hello world!!!");
-	textset(textdisplay4,64,"hello world!!!");
+	textset(textdisplay1,FONT_SIZE,"hello world!!!");
+	textset(textdisplay2,FONT_SIZE,"hello world!!!");
+	textset(textdisplay3,FONT_SIZE,"hello world!!!");
+	textset(textdisplay4,FONT_SIZE,"hello world!!!");
 	group1->show();
 	win->redraw();
 }
@@ -93,11 +101,16 @@ void text_cb(Widget *,void *){
 void* prime_func(void* p)
 {
 	int count =0;
+	struct timeval t1, t2;
+	double timecost;
+	
 	group1->hide();
 	group2->hide();
 
-	for (count=0;count<100;count++){
-		//printf("show_message....");
+	//start timer
+	gettimeofday(&t1, NULL);
+
+	for (count=0;count<500;count++){
 		usleep(5000);
 		
 		if((count%2)==0){
@@ -112,20 +125,10 @@ void* prime_func(void* p)
 		fltk::awake((void*)(box)); 
 		win->redraw();
 	}
-	
 	box->hide();
-	textset(textdisplay1,64,"hello world1 $$$$$$$$");
-	textset(textdisplay2,64,"hello world1 $$$$$$$$");
-	textset(textdisplay3,64,"hello world1 $$$$$$$$");
-	textset(textdisplay4,64,"hello world1 $$$$$$$$");
-
-	textset(textdisplay5,64,"weintek lab @@@@@@");
-	textset(textdisplay6,64,"weintek lab @@@@@@");
-	textset(textdisplay7,64,"weintek lab @@@@@@");
-	textset(textdisplay8,64,"weintek lab @@@@@@");
 	
-	win->redraw();
-	for (count=0;count<100;count++){
+	//win->redraw();
+	for (count=0;count<500;count++){
 		usleep(5000);
 		fltk::lock();
 		if((count%2)==0){
@@ -143,22 +146,29 @@ void* prime_func(void* p)
 		}
 		win->redraw();
 	}
+
+	// stop timer
+	gettimeofday(&t2, NULL);
+	timecost = (t2.tv_sec - t1.tv_sec) * 1000.0;    // sec to ms
+	timecost += (t2.tv_usec - t1.tv_usec) / 1000.0; // us to ms
+	printf("Code time cost: %f\n", timecost/1000);
+
 }
 
 int main (int argc, char **argv) 
 {
-	win= new fltk::Window(800, 480,"single thread");
+	win= new fltk::Window(WIDTH, HEIGHT,"single thread");
 	win->begin();
 
-	box = new Widget(10, 10, 780, 400);
+	box = new Widget(10, 10, WIDTH-20, HEIGHT-80);
 
-	Button* pageswitch1 = new Button(50,420,80,40,"png");
+	Button* pageswitch1 = new Button(50,HEIGHT-60,BW,BH,"png");
 	pageswitch1->callback(png_cb);
 	
-	Button* pageswitch2 = new Button(200,420,80,40,"jpeg");
+	Button* pageswitch2 = new Button(200,HEIGHT-60,BW,BH,"jpeg");
 	pageswitch2->callback(jpeg_cb);
 		
-	Button* pageswitch3 = new Button(350,420,80,40,"text");
+	Button* pageswitch3 = new Button(350,HEIGHT-60,BW,BH,"text");
 	pageswitch3->callback(text_cb);
 
 	image=imagepng1;
@@ -181,6 +191,19 @@ int main (int argc, char **argv)
 	textdisplay7 = new Widget(20,20,750,80);
 	textdisplay8 = new Widget(20,20,750,80);
 	group2->end(); 
+	
+	textset(textdisplay1,FONT_SIZE,"hello world hello world");
+	textset(textdisplay2,FONT_SIZE,"hello world hello world");
+	textset(textdisplay3,FONT_SIZE,"hello world hello world");
+	textset(textdisplay4,FONT_SIZE,"hello world hello world");
+
+	textset(textdisplay5,FONT_SIZE,"weintek lab iEXE series");
+	textset(textdisplay6,FONT_SIZE,"weintek lab iEXE series");
+	textset(textdisplay7,FONT_SIZE,"weintek lab iEXE series");
+	textset(textdisplay8,FONT_SIZE,"weintek lab iEXE series");
+	
+	group1->hide();
+	group2->hide();
 
 	win->end();
 	win->show(argc,argv);
