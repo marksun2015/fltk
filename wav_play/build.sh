@@ -1,1 +1,1 @@
-arm-linux-gcc wav_file.c play.c -o play -lasound -Wall
+g++ wav_file.cxx play.cxx -o play -lasound -Wall
